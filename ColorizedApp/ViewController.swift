@@ -8,6 +8,7 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
     @IBOutlet var colorView: UIView!
     
     @IBOutlet var redLabel: UILabel!
@@ -21,34 +22,41 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        initialSetup()
+        setupSliders()
+        
+        setupLabels()
+        
+        setupView()
     }
 
-    @IBAction func changeRedSlider() {
-        changeViewColor()
+    @IBAction func sliderChanged(_ sender: UISlider) {
+        setupView()
+                
+        switch sender {
+        case redSlider:
+            redLabel.text = getRounded(number: redSlider.value)
+        case greenSlider:
+            greenLabel.text = getRounded(number: greenSlider.value)
+        case blueSlider:
+            blueLabel.text = getRounded(number: blueSlider.value)
+        default:
+            break
+        }
     }
     
-    @IBAction func changeGreenSlider() {
-        changeViewColor()
-    }
-    
-    @IBAction func changeBlueSlider() {
-        changeViewColor()
-    }
-    
-    private func initialSetup() {
-        redSlider.minimumTrackTintColor = .red
-        greenSlider.minimumTrackTintColor = .green
-        blueSlider.minimumTrackTintColor = .blue
-        
-        changeViewColor()
-    }
-    
-    private func changeViewColor() {
+    private func setupLabels() {
         redLabel.text = getRounded(number: redSlider.value)
         greenLabel.text = getRounded(number: greenSlider.value)
         blueLabel.text = getRounded(number: blueSlider.value)
-        
+    }
+    
+    private func setupSliders() {
+        redSlider.minimumTrackTintColor = .red
+        greenSlider.minimumTrackTintColor = .green
+        blueSlider.minimumTrackTintColor = .blue
+    }
+    
+    private func setupView() {
         colorView.backgroundColor = UIColor(red: CGFloat(redSlider.value),
                                             green: CGFloat(greenSlider.value),
                                             blue: CGFloat(blueSlider.value),
