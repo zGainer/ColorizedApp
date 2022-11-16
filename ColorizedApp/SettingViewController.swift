@@ -58,8 +58,10 @@ class SettingViewController: UIViewController {
     }
     
     private func initialSetting() {
-        initializeHideKeyboard()
-                
+        let tap = UITapGestureRecognizer(target: view,
+                                         action: #selector(UIView.endEditing))
+        view.addGestureRecognizer(tap)
+        
         redTF.delegate = self
         greenTF.delegate = self
         blueTF.delegate = self
@@ -115,19 +117,6 @@ class SettingViewController: UIViewController {
     
     private func string (from slider: UISlider) -> String {
         String(format: "%.2f", slider.value)
-    }
-}
-
-extension SettingViewController {
-    func initializeHideKeyboard() {
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self,
-                                                                 action: #selector(dismissKeyboard))
-        
-        view.addGestureRecognizer(tap)
-    }
-    
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
     }
 }
 
