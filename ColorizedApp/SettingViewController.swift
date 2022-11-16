@@ -10,7 +10,9 @@ import UIKit
 class SettingViewController: UIViewController {
     
     @IBOutlet var colorView: UIView!
-        
+    
+    @IBOutlet var toolBar: UIToolbar!
+    
     @IBOutlet var redLabel: UILabel!
     @IBOutlet var greenLabel: UILabel!
     @IBOutlet var blueLabel: UILabel!
@@ -29,19 +31,17 @@ class SettingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        redTF.delegate = self
-        greenTF.delegate = self
-        blueTF.delegate = self
-        
-        setSliders()
-        setLabels()
-        setTextFields()
-        setViewColor()
+        initialSetting()
     }
     
+    // Не работает с клавиатурой в тулбаре (не понял почему)
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        super.touchesBegan(touches, with: event)
+//
+//        view.endEditing(true)
+//    }
+    
     @IBAction func sliderChanged(_ sender: UISlider) {
-        view.endEditing(true)
-        
         setViewColor()
         
         setOnSliderChange(sender)
@@ -51,6 +51,23 @@ class SettingViewController: UIViewController {
         delegate.setMainViewColor(color: colorView.backgroundColor)
         
         dismiss(animated: true)
+    }
+    
+    @IBAction func toolbarDoneTapped(_ sender: UIBarButtonItem) {
+        view.endEditing(true)
+    }
+    
+    private func initialSetting() {
+        initializeHideKeyboard()
+                
+        redTF.delegate = self
+        greenTF.delegate = self
+        blueTF.delegate = self
+        
+        setSliders()
+        setLabels()
+        setTextFields()
+        setViewColor()
     }
     
     private func setSliders() {
@@ -101,10 +118,35 @@ class SettingViewController: UIViewController {
     }
 }
 
+extension SettingViewController {
+    func initializeHideKeyboard() {
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self,
+                                                                 action: #selector(dismissKeyboard))
+        
+        view.addGestureRecognizer(tap)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
+
 // MARK: - UITextFieldDelegate
 
 extension SettingViewController: UITextFieldDelegate {
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        textField.inputAccessoryView = toolBar
+        
+        return true
+    }
+    
     func textFieldDidEndEditing(_ textField: UITextField) {
+        setOnEndEditing(textField)
+        
+        setViewColor()
+    }
+    
+    private func setOnEndEditing(_ textField: UITextField) {
         guard let newValue = textField.text else { return }
         guard let floatNewValue = Float(newValue) else { return }
         
@@ -121,7 +163,5 @@ extension SettingViewController: UITextFieldDelegate {
         default:
             break
         }
-        
-        setViewColor()
     }
 }
