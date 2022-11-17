@@ -30,11 +30,13 @@ class SettingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let tap = UITapGestureRecognizer(target: view,
-                                         action: #selector(UIView.endEditing))
-        view.addGestureRecognizer(tap)
-        
         initialSetting()
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        
+        view.endEditing(true)
     }
     
     @IBAction func sliderChanged(_ sender: UISlider) {
