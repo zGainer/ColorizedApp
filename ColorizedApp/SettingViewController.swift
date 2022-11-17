@@ -10,9 +10,7 @@ import UIKit
 class SettingViewController: UIViewController {
     
     @IBOutlet var colorView: UIView!
-    
-    @IBOutlet var toolBar: UIToolbar!
-    
+        
     @IBOutlet var redLabel: UILabel!
     @IBOutlet var greenLabel: UILabel!
     @IBOutlet var blueLabel: UILabel!
@@ -27,19 +25,17 @@ class SettingViewController: UIViewController {
     
     var mainViewColor: UIColor!
     var delegate: SettingViewControllerDelegate!
+    var toolBar = UIToolbar()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let tap = UITapGestureRecognizer(target: view,
+                                         action: #selector(UIView.endEditing))
+        view.addGestureRecognizer(tap)
+        
         initialSetting()
     }
-    
-    // Не работает с клавиатурой в тулбаре (не понял почему)
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        super.touchesBegan(touches, with: event)
-//
-//        view.endEditing(true)
-//    }
     
     @IBAction func sliderChanged(_ sender: UISlider) {
         setViewColor()
@@ -48,7 +44,9 @@ class SettingViewController: UIViewController {
     }
     
     @IBAction func doneButtonTapped() {
-        delegate.setMainViewColor(color: colorView.backgroundColor)
+        guard let color = colorView.backgroundColor else { return }
+        
+        delegate.setMainViewColor(color)
         
         dismiss(animated: true)
     }
@@ -58,13 +56,11 @@ class SettingViewController: UIViewController {
     }
     
     private func initialSetting() {
-        let tap = UITapGestureRecognizer(target: view,
-                                         action: #selector(UIView.endEditing))
-        view.addGestureRecognizer(tap)
-        
         redTF.delegate = self
         greenTF.delegate = self
         blueTF.delegate = self
+        
+        colorView.layer.cornerRadius = 20
         
         setSliders()
         setLabels()
@@ -120,13 +116,40 @@ class SettingViewController: UIViewController {
     }
 }
 
+extension SettingViewController {
+    private func showAlert(title: String, message: String, textField: UITextField? = nil) {
+        
+        let alert = UIAlertController(title: title,
+                                      message: message,
+                                      preferredStyle: .alert)
+        
+        let ok = UIAlertAction(title: "OK", style: .default) { _ in
+            textField?.text = ""
+        }
+        
+        alert.addAction(ok)
+        
+        present(alert, animated: true)
+    }
+}
+
 // MARK: - UITextFieldDelegate
 
 extension SettingViewController: UITextFieldDelegate {
-    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        textField.inputAccessoryView = toolBar
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        let done = UIBarButtonItem(title: "Done",
+                                   style: .plain,
+                                   target: self,
+                                   action: #selector(hideKeyboard))
         
-        return true
+        toolBar.items = [done]
+        toolBar.sizeToFit()
+        
+        textField.inputAccessoryView = toolBar
+    }
+    
+    @objc func hideKeyboard() {
+        view.endEditing(true)
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
@@ -137,18 +160,22 @@ extension SettingViewController: UITextFieldDelegate {
     
     private func setOnEndEditing(_ textField: UITextField) {
         guard let newValue = textField.text else { return }
-        guard let floatNewValue = Float(newValue) else { return }
-        
+        guard let floatNewValue = Float(newValue) else {
+            showAlert(title: "Error", message: "Wrong format!")
+            
+            return
+        }
+
         switch textField {
         case redTF:
             redLabel.text = newValue
-            redSlider.value = floatNewValue
+            redSlider.setValue(floatNewValue, animated: true)
         case greenTF:
             greenLabel.text = newValue
-            greenSlider.value = floatNewValue
+            greenSlider.setValue(floatNewValue, animated: true)
         case blueTF:
             blueLabel.text = newValue
-            blueSlider.value = floatNewValue
+            blueSlider.setValue(floatNewValue, animated: true)
         default:
             break
         }

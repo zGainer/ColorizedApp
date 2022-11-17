@@ -8,17 +8,14 @@
 import UIKit
 
 protocol SettingViewControllerDelegate {
-    func setMainViewColor (color: UIColor?)
+    func setMainViewColor (_ color: UIColor)
 }
 
 class MainViewController: UIViewController {
-
-    @IBOutlet var mainView: UIView!
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let settingVC = segue.destination as? SettingViewController else { return }
         
-        settingVC.mainViewColor = mainView.backgroundColor
+        settingVC.mainViewColor = view.backgroundColor
         settingVC.delegate = self
     }
 }
@@ -26,7 +23,7 @@ class MainViewController: UIViewController {
 // MARK: - SettingViewControllerDelegate
 
 extension MainViewController: SettingViewControllerDelegate {
-    func setMainViewColor(color: UIColor?) {
-        mainView.backgroundColor = color
+    func setMainViewColor(_ color: UIColor) {
+        view.backgroundColor = color
     }
 }
