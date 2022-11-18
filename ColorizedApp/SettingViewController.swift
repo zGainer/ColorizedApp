@@ -71,11 +71,17 @@ class SettingViewController: UIViewController {
     }
     
     private func setSliders() {
-        guard let components = mainViewColor.cgColor.components else { return }
+//        guard let components = mainViewColor.cgColor.components else { return }
+//
+//        redSlider.value = Float(components[0])
+//        greenSlider.value = Float(components[1])
+//        blueSlider.value = Float(components[2])
         
-        redSlider.value = Float(components[0])
-        greenSlider.value = Float(components[1])
-        blueSlider.value = Float(components[2])
+        let color = CIColor(color: mainViewColor)
+        
+        redSlider.value = Float(color.red)
+        greenSlider.value = Float(color.green)
+        blueSlider.value = Float(color.blue)
     }
     
     private func setLabels() {
